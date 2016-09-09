@@ -7,8 +7,9 @@
         <groupId>com.huntdreams.xxq</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
+
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>random-forest</artifactId>
+    <artifactId>maleware-classification-random-forest</artifactId>
     <packaging>jar</packaging>
     <name>Maleware Classification with Random Forest</name>
     <version>1.0-SNAPSHOT</version>
@@ -21,5 +22,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>
