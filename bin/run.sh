@@ -7,23 +7,26 @@ if [ $# != 2 ]; then
 fi
 
 # 判断提交的文件是否存在
-FILENAME=$1
-CLASS_NAME=$2
-if [ ! -f "$FILENAME" ]; then
-    echo "$FILENAME does not exist.";
+filename=$1
+class_name=$2
+cur_dir=$(cd "$(dirname "$0")"; pwd)
+jar_dir=$cur_dir/../jars
+filename="$jar_dir/$filename"
+if [ ! -f "$filename" ]; then
+    echo "$filename does not exist.";
     exit 0;
 fi
-cur_dir=$(cd "$(dirname "$0")"; pwd)
-FILENAME="$cur_dir/$FILENAME"
+
+
 # 提取主机名
-HOSTNAME=`hostname`
-echo "Running spark on : $HOSTNAME";
+hostname=`hostname`
+echo "Running spark on : $hostname";
 
 # 提交Spark Job
-SUBMIT_URL=spark://$HOSTNAME:7077
+submit_url=spark://$hostname:7077
 $SPARK_HOME/bin/spark-submit \
-  --class $CLASS_NAME \
-  --master $SUBMIT_URL \
+  --class $class_name \
+  --master $submit_url \
   --executor-memory 6G \
   --total-executor-cores 4 \
-  $FILENAME
+  $filename
