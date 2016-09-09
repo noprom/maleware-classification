@@ -8,4 +8,4 @@
 ## Run
 运行这个项目, 执行以下命令即可:
 
-    bin/run.sh jar-file-in-jars-directory class-name
+    bin/run.sh jar-file-in-the-jars-directory class-name
