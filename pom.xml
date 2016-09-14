@@ -10,6 +10,7 @@
     <modules>
         <module>svm</module>
         <module>random-forest</module>
+        <module>spark-examples</module>
     </modules>
     <packaging>pom</packaging>
     <name>Maleware Classification with Spark</name>

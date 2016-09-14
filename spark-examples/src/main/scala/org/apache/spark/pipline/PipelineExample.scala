@@ -1,4 +1,4 @@
-package com.huntdreams.svm.pipline
+package org.apache.spark.pipline
 
 import org.apache.spark.ml.linalg.Vector
 import org.apache.spark.ml.{PipelineModel, Pipeline}
