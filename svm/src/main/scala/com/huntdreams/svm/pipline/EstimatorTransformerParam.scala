@@ -1,13 +1,9 @@
 package com.huntdreams.svm.pipline
 
-
-// $example on$
 import org.apache.spark.ml.classification.LogisticRegression
 import org.apache.spark.ml.linalg.{Vector, Vectors}
 import org.apache.spark.ml.param.ParamMap
 import org.apache.spark.sql.Row
-
-// $example off$
 import org.apache.spark.sql.SparkSession
 
 /**
@@ -24,7 +20,6 @@ object EstimatorTransformerParam {
       .appName("EstimatorTransformerParamExample")
       .getOrCreate()
 
-    // $example on$
     // Prepare training data from a list of (label, features) tuples.
     val training = spark.createDataFrame(Seq(
       (1.0, Vectors.dense(0.0, 1.1, 0.1)),
@@ -82,10 +77,7 @@ object EstimatorTransformerParam {
       .foreach { case Row(features: Vector, label: Double, prob: Vector, prediction: Double) =>
         println(s"($features, $label) -> prob=$prob, prediction=$prediction")
       }
-    // $example off$
 
     spark.stop()
   }
 }
-
-// scalastyle:on println

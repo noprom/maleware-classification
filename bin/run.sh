@@ -24,7 +24,7 @@ echo "Running spark on : $hostname";
 
 # 提交Spark Job
 submit_url=spark://$hostname:7077
-$SPARK_HOME/bin/spark-submit \
+sudo $SPARK_HOME/bin/spark-submit \
   --class $class_name \
   --master $submit_url \
   --executor-memory 6G \
