@@ -3,6 +3,9 @@
 cur_dir=$(cd "$(dirname "$0")"; pwd)
 # clean jars
 jar_dir=$cur_dir/../jars
+if [ ! -d $jar_dir ]; then
+  mkdir $jar_dir
+fi
 rm -rf $jar_dir/*
 
 # build modules and copy jars
