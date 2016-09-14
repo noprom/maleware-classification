@@ -9,7 +9,11 @@ fi
 rm -rf $jar_dir/*
 
 # build modules and copy jars
-modules=("svm" "random-forest" "spark-examples")
+if [ $# -eq 1 ]; then
+    modules=($1)
+else
+    modules=("svm" "random-forest" "spark-examples")
+fi
 for module in ${modules[@]}; do
     echo "building module ${module}..."
     module_dir=${cur_dir}/../${module}
