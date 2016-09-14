@@ -6,3 +6,4 @@ target
 *.iml
 *.jar
 .idea
+local_data
