@@ -7,3 +7,5 @@ target
 *.jar
 .idea
 local_data
+jars/
+spark-warehouse/
