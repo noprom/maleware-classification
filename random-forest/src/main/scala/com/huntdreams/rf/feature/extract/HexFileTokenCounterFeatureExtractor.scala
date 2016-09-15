@@ -7,7 +7,7 @@ import org.apache.spark.sql.SparkSession
 /**
   * HexFileTokenCounterFeatureExtractor
   * <p>Extract token count feature from hex dump-based file.</p>
-  * 
+  *
   * Usage:
   * To run it on a cluster, you can use:
   *   HexFileTokenCounterFeatureExtractor <masterUrl> <dataPath> <trainDataPath> <trainLabels>
@@ -35,21 +35,29 @@ object HexFileTokenCounterFeatureExtractor extends Serializable {
   case class MaleWare(id: String, label: Int) extends Serializable
 
   def main(args: Array[String]): Unit = {
-//    val masterUrl = if (args.length)
+    val masterUrl = "local"
+    val dataPath = "/Users/noprom/Documents/Dev/Spark/Pro/malware-classification/data"
+    val trainDataPath = dataPath + "/subtrain"
+    val trainLabels = dataPath + "/subtrainLabels.csv"
+
+    // 如果传递了参数过来, 则覆盖默认的设置
+    if (args.length == 3) {
+      val Array(dataPath, trainDataPath, trainLabels) = args
+    } else if (args.length == 4){
+      val Array(masterUrl, dataPath, trainDataPath, trainLabels) = args
+    }
+    args.foreach(println)
 
     val spark = SparkSession
       .builder()
       .appName("HexFileTokenCounterFeatureExtractor")
-      .config("spark.master", "local")
+      .config("spark.master", masterUrl)
       .getOrCreate()
 
     // 以参数的形式传递过来
-    val dataPath = "/Users/noprom/Documents/Dev/Spark/Pro/malware-classification/data"
-    val trainPath = dataPath + "/subtrain"
-    val trainLabelFileName = dataPath + "/subtrainLabels.csv"
     val outPutFileName = dataPath + "/hexFileTokenCountFeature.csv"
     val writer = new PrintWriter(outPutFileName)
-    val reader = new BufferedReader(new FileReader(trainLabelFileName))
+    val reader = new BufferedReader(new FileReader(trainLabels))
 
     writer.write("ID,")
     // 生成Hex Header
@@ -70,7 +78,7 @@ object HexFileTokenCounterFeatureExtractor extends Serializable {
       writer.write(fileName)
       print(fileName)
       if (!fileName.equals("Id")) {
-        val filePath = trainPath + "/" + fileName
+        val filePath = trainDataPath + "/" + fileName
         val hexFile = spark.sparkContext.textFile(filePath + ".bytes")
 
         // 统计 Hex 文件中的 Token TF
