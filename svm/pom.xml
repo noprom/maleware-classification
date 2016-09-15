@@ -12,7 +12,7 @@
     <artifactId>malware-classification-svm</artifactId>
     <packaging>jar</packaging>
     <name>Malware Classification with SVM</name>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0</version>
 
     <build>
         <plugins>

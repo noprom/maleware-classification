@@ -22,9 +22,9 @@ import org.apache.spark.sql.SparkSession
   *
   * Example:
   *   To run it on a spark cluster:
-  *     $ bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar masterUrl dataPath trainDataPath trainLabels
+  *     $ bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar com.huntdreams.rf.feature.extract.HexFileTokenCounterFeatureExtractor masterUrl dataPath trainDataPath trainLabels
   *   Or, run it locally:
-  *     $ bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar dataPath trainDataPath trainLabels
+  *     $ bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar com.huntdreams.rf.feature.extract.HexFileTokenCounterFeatureExtractor dataPath trainDataPath trainLabels
   *   You can also hit the run button in Intellij IDEA to run it locally.
   *
   * Author: Noprom <tyee.noprom@qq.com>
@@ -32,24 +32,38 @@ import org.apache.spark.sql.SparkSession
   */
 object HexFileTokenCounterFeatureExtractor extends Serializable {
 
-  case class MaleWare(id: String, label: Int) extends Serializable
-
   def main(args: Array[String]): Unit = {
     var masterUrl = "local"
     var dataPath = "/Users/noprom/Documents/Dev/Spark/Pro/malware-classification/data"
     var trainDataPath = dataPath + "/subtrain"
     var trainLabels = dataPath + "/subtrainLabels.csv"
 
+    println("args.length = " + args.length)
+    args.foreach(println)
     // 如果传递了参数过来, 则覆盖默认的设置
-    if (args.length == 3) {
+    if (args.length == 4) {
       dataPath = args(0)
       trainDataPath = args(1)
       trainLabels = args(2)
-    } else if (args.length == 4) {
+    } else if (args.length == 5) {
       masterUrl = args(0)
       dataPath = args(1)
       trainDataPath = args(2)
       trainLabels = args(3)
+    } else if (args.length != 0) {
+      System.err.println(s"""
+        |Usage:
+        |Run it on a cluster:
+        |  HexFileTokenCounterFeatureExtractor <masterUrl> <dataPath> <trainDataPath> <trainLabels>
+        |Run it locally:
+        |  HexFileTokenCounterFeatureExtractor <dataPath> <trainDataPath> <trainLabels>
+        |Arguments:
+        |  `masterUrl` is the master url of the spark cluster.
+        |  `dataPath` is the path of your data, not the train data path, and feature results will be generated here.
+        |  `trainDataPath` is the path of your train data.
+        |  `trainLabels` is the malware samples that you want to extract features from and train, it must be in the `dataPath`.
+        """.stripMargin)
+      System.exit(1)
     }
 
     val spark = SparkSession
@@ -94,7 +108,7 @@ object HexFileTokenCounterFeatureExtractor extends Serializable {
 
           for (hex <- headers) {
             // 写进文件
-            val count = wordCounts(hex)
+            val count = wordCounts.getOrElse(hex, 0)
             print("," + count)
             writer.write("," + count.toString)
           }
