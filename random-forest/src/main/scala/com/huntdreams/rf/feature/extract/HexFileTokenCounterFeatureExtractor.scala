@@ -77,7 +77,7 @@ object HexFileTokenCounterFeatureExtractor extends Serializable {
     val writer = new PrintWriter(outPutFileName)
     val reader = new BufferedReader(new FileReader(trainLabels))
 
-    writer.write("ID,")
+    writer.write("ID,Label,")
     // 生成Hex Header
     var headers = List.empty[String]
     for (i <- 0 to 255) {
@@ -94,8 +94,8 @@ object HexFileTokenCounterFeatureExtractor extends Serializable {
     while ((line = reader.readLine()) != Nil) {
       if (line != null && !line.isEmpty) {
         val Array(fileName, label) = line.split(",")
-        writer.write(fileName)
-        print(fileName)
+        writer.write(fileName + "," + label)
+        print(fileName + "," + label)
         if (!fileName.equals("Id")) {
           val filePath = trainDataPath + "/" + fileName
           val hexFile = spark.sparkContext.textFile(filePath + ".bytes")
