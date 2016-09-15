@@ -7,3 +7,5 @@ target
 *.jar
 .idea
 spark-warehouse
+data
+out
