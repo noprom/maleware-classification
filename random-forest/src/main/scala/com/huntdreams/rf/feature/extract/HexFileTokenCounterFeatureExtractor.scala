@@ -92,7 +92,7 @@ object HexFileTokenCounterFeatureExtractor extends Serializable {
     // 遍历所有文件
     var line: String = null
     while ((line = reader.readLine()) != Nil) {
-      if (!line.isEmpty) {
+      if (line != null && !line.isEmpty) {
         val Array(fileName, label) = line.split(",")
         writer.write(fileName)
         print(fileName)
