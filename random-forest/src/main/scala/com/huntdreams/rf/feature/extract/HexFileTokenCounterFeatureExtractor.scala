@@ -35,18 +35,22 @@ object HexFileTokenCounterFeatureExtractor extends Serializable {
   case class MaleWare(id: String, label: Int) extends Serializable
 
   def main(args: Array[String]): Unit = {
-    val masterUrl = "local"
-    val dataPath = "/Users/noprom/Documents/Dev/Spark/Pro/malware-classification/data"
-    val trainDataPath = dataPath + "/subtrain"
-    val trainLabels = dataPath + "/subtrainLabels.csv"
+    var masterUrl = "local"
+    var dataPath = "/Users/noprom/Documents/Dev/Spark/Pro/malware-classification/data"
+    var trainDataPath = dataPath + "/subtrain"
+    var trainLabels = dataPath + "/subtrainLabels.csv"
 
     // 如果传递了参数过来, 则覆盖默认的设置
     if (args.length == 3) {
-      val Array(dataPath, trainDataPath, trainLabels) = args
-    } else if (args.length == 4){
-      val Array(masterUrl, dataPath, trainDataPath, trainLabels) = args
+      dataPath = args(0)
+      trainDataPath = args(1)
+      trainLabels = args(2)
+    } else if (args.length == 4) {
+      masterUrl = args(0)
+      dataPath = args(1)
+      trainDataPath = args(2)
+      trainLabels = args(3)
     }
-    args.foreach(println)
 
     val spark = SparkSession
       .builder()
