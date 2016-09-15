@@ -1,5 +1,15 @@
 #!/usr/bin/env bash
 
+option=$1
+case ${option} in
+     -h)
+        echo "Usage:"
+        echo "-h                    print help message."
+        echo "module_name           compile module named module_name, modules available: svm random-forest spark-examples"
+        exit 1
+        ;;
+esac
+
 cur_dir=$(cd "$(dirname "$0")"; pwd)
 # clean jars
 jar_dir=$cur_dir/../jars

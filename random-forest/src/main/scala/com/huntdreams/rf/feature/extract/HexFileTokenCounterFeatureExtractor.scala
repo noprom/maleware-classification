@@ -77,28 +77,30 @@ object HexFileTokenCounterFeatureExtractor extends Serializable {
     writer.write("\n")
     // 遍历所有文件
     var line: String = null
-    while ((line = reader.readLine()) != null) {
-      val Array(fileName, label) = line.split(",")
-      writer.write(fileName)
-      print(fileName)
-      if (!fileName.equals("Id")) {
-        val filePath = trainDataPath + "/" + fileName
-        val hexFile = spark.sparkContext.textFile(filePath + ".bytes")
+    while ((line = reader.readLine()) != Nil) {
+      if (!line.isEmpty) {
+        val Array(fileName, label) = line.split(",")
+        writer.write(fileName)
+        print(fileName)
+        if (!fileName.equals("Id")) {
+          val filePath = trainDataPath + "/" + fileName
+          val hexFile = spark.sparkContext.textFile(filePath + ".bytes")
 
-        // 统计 Hex 文件中的 Token TF
-        val wordCounts = hexFile.flatMap(line => line.split(" "))
-          .filter(word => headers.contains(word))
-          .map(word => (word, 1))
-          .reduceByKey((a, b) => a + b).cache().collect().toMap
+          // 统计 Hex 文件中的 Token TF
+          val wordCounts = hexFile.flatMap(line => line.split(" "))
+            .filter(word => headers.contains(word))
+            .map(word => (word, 1))
+            .reduceByKey((a, b) => a + b).cache().collect().toMap
 
-        for (hex <- headers) {
-          // 写进文件
-          val count = wordCounts(hex)
-          print("," + count)
-          writer.write("," + count.toString)
+          for (hex <- headers) {
+            // 写进文件
+            val count = wordCounts(hex)
+            print("," + count)
+            writer.write("," + count.toString)
+          }
+          writer.write("\n")
+          print("\n")
         }
-        writer.write("\n")
-        print("\n")
       }
     }
     writer.close()

@@ -2,7 +2,7 @@
 
 # 判断参数个数
 if [ $# -lt 2 ]; then
-    echo "Usage: $0 the-file-you-want-to-submit.jar classname [param1 param2 param3]";
+    echo "Usage: $0 the-file-you-want-to-submit.jar classname [param1 param2 param3 ...]";
     exit 1;
 fi
 
@@ -29,4 +29,4 @@ sudo $SPARK_HOME/bin/spark-submit \
   --executor-memory 6G \
   --total-executor-cores 4 \
   $filename \
-  $3 $4 $5
+  $3 $4 $5 $6 $7 $8 $9 $10
