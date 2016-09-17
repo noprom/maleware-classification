@@ -73,8 +73,9 @@ object HexFileTokenCounterFeatureExtractor extends Serializable {
       .getOrCreate()
 
     // 以参数的形式传递过来
-    val outPutFileName = dataPath + "/hexFileTokenCountFeature.csv"
-    val writer = new PrintWriter(outPutFileName)
+    val outPutFileName = dataPath + "/hex_file_token_count_feature"
+    val writer = new PrintWriter(outPutFileName + ".csv")
+    val svmWriter = new PrintWriter(outPutFileName + ".svm.txt")
     val reader = new BufferedReader(new FileReader(trainLabels))
 
     writer.write("ID,Label,")
@@ -94,9 +95,11 @@ object HexFileTokenCounterFeatureExtractor extends Serializable {
     while ((line = reader.readLine()) != Nil) {
       if (line != null && !line.isEmpty) {
         val Array(fileName, label) = line.split(",")
-        writer.write(fileName + "," + label)
-        print(fileName + "," + label)
         if (!fileName.equals("Id")) {
+          writer.write(fileName + "," + label)
+          print(fileName + "," + label)
+          // Write SVM data
+          svmWriter.write(label)
           val filePath = trainDataPath + "/" + fileName
           val hexFile = spark.sparkContext.textFile(filePath + ".bytes")
 
@@ -106,18 +109,23 @@ object HexFileTokenCounterFeatureExtractor extends Serializable {
             .map(word => (word, 1))
             .reduceByKey((a, b) => a + b).cache().collect().toMap
 
+          var cnt = 0
           for (hex <- headers) {
-            // 写进文件
+            // 写文件
             val count = wordCounts.getOrElse(hex, 0)
+            cnt = cnt + 1
             print("," + count)
             writer.write("," + count.toString)
+            svmWriter.write(" " + cnt.toString + ":" + count.toString)
           }
           writer.write("\n")
+          svmWriter.write("\n")
           print("\n")
         }
       }
     }
     writer.close()
+    svmWriter.close()
   }
 
   /**

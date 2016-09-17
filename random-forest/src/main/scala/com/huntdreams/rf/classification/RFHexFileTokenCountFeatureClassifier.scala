@@ -1,13 +1,13 @@
 package com.huntdreams.rf.classification
 
-import com.huntdreams.rf.feature.extract.HexFileTokenCounterFeatureExtractor
 import org.apache.spark.ml.Pipeline
 import org.apache.spark.ml.classification.{RandomForestClassificationModel, RandomForestClassifier}
 import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator
-import org.apache.spark.ml.feature.{IndexToString, VectorIndexer, StringIndexer}
-import org.apache.spark.ml.linalg.{DenseVector, Vectors}
+import org.apache.spark.ml.feature.{IndexToString, StringIndexer, VectorIndexer}
+import org.apache.spark.ml.linalg.Vectors
+import org.apache.spark.sql.api.java.UDF22
+import org.apache.spark.sql.types.{StringType, StructField, StructType}
 import org.apache.spark.sql.{Row, SparkSession}
-import org.apache.spark.sql.types.{StructType, StringType, StructField}
 
 /**
   * RFHexFileTokenCountFeatureClassifier
@@ -46,10 +46,11 @@ object RFHexFileTokenCountFeatureClassifier extends Serializable {
     //      }
     //    }
 
+
     // Generate the schema based on the string of schema
     val fields = schemaString.split(" ").map(fieldName => fieldName match {
       case "features" => StructField(fieldName, StringType, nullable = true)
-      case _ => StructField(fieldName, Vectors, nullable = true)
+//      case _ => StructField(fieldName, Vectors, nullable = true)
     })
     val schema = StructType(fields)
 
