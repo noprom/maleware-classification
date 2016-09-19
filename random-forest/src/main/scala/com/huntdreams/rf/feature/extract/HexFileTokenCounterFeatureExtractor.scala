@@ -70,6 +70,7 @@ object HexFileTokenCounterFeatureExtractor extends Serializable {
       .builder()
       .appName("HexFileTokenCounterFeatureExtractor")
       .config("spark.master", masterUrl)
+      .config("spark.dynamicAllocation.enabled", "false")
       .getOrCreate()
 
     // 以参数的形式传递过来

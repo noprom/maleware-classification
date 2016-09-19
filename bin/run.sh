@@ -3,11 +3,15 @@
 # 判断参数个数
 if [ $# -lt 2 ]; then
     echo "Usage: $0 the-file-you-want-to-submit.jar classname [param1 param2 param3 ...]";
-    echo "Available commands:"
-    echo "Feature extractor:"
+    echo -e "Available commands:\n"
+    echo -e "========== Feature extractor ==========\n"
+    echo -e "HexFileTokenCounterFeatureExtractor:"
     echo "  $ bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar com.huntdreams.rf.feature.extract.HexFileTokenCounterFeatureExtractor masterUrl dataPath trainDataPath trainLabels"
     echo "  $ bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar com.huntdreams.rf.feature.extract.HexFileTokenCounterFeatureExtractor dataPath trainDataPath trainLabels"
-    echo "Classification:"
+    echo -e "\n==========  Classification   ==========\n"
+    echo -e "RFHexFileTokenCountFeatureClassifier:"
+    echo "  $ bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar com.huntdreams.rf.classification.RFHexFileTokenCountFeatureClassifier masterUrl hexFileTokenCountFeature"
+    echo "  $ bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar com.huntdreams.rf.classification.RFHexFileTokenCountFeatureClassifier hexFileTokenCountFeature"
     exit 1;
 fi
 

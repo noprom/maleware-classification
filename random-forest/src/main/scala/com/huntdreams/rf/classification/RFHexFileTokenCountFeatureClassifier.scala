@@ -5,15 +5,28 @@ import org.apache.spark.ml.classification.{RandomForestClassificationModel, Rand
 import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator
 import org.apache.spark.ml.feature.{IndexToString, StringIndexer, VectorIndexer}
 import org.apache.spark.ml.linalg.Vectors
-import org.apache.spark.sql.api.java.UDF22
-import org.apache.spark.sql.types.{StringType, StructField, StructType}
-import org.apache.spark.sql.{Row, SparkSession}
+import org.apache.spark.sql.SparkSession
 
 /**
   * RFHexFileTokenCountFeatureClassifier
   * <p>Use random forest and hex file token count feature to classify the malware.</p>
   *
   * Usage:
+  * To run it on a cluster, you can use:
+  *   RFHexFileTokenCountFeatureClassifier <masterUrl> <hexFileTokenCountFeature> <numTrees>
+  * Or, you can run it locally:
+  *   RFHexFileTokenCountFeatureClassifier <hexFileTokenCountFeature> <numTrees>
+  *
+  * Arguments:
+  *   `masterUrl` is the master url of the spark cluster.
+  *   `hexFileTokenCountFeature` is the result of HexFileTokenCounterFeatureExtractor.
+  *
+  * Example:
+  *   To run it on a spark cluster:
+  *     $ bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar com.huntdreams.rf.classification.RFHexFileTokenCountFeatureClassifier masterUrl hexFileTokenCountFeature numTrees
+  *   Or, run it locally:
+  *     $ bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar com.huntdreams.rf.classification.RFHexFileTokenCountFeatureClassifier hexFileTokenCountFeature numTrees
+  *   You can also hit the run button in Intellij IDEA to run it locally.
   *
   * Author: Noprom <tyee.noprom@qq.com>
   * Date: 9/15/16 2:34 PM.
@@ -23,9 +36,32 @@ object RFHexFileTokenCountFeatureClassifier extends Serializable {
   def main(args: Array[String]): Unit = {
     // Load hex file token count features
     var masterUrl = "local"
-    var tokenCountFeature = "/Users/noprom/Documents/Dev/Spark/Pro/malware-classification/data/hexFileTokenCountFeature.csv1"
+    var tokenCountFeature = "/Users/noprom/Documents/Dev/Spark/Pro/malware-classification/data/hexFileTokenCountFeature.csv"
+    var numTrees = 500
 
-    // TODO: change these values by params
+    // Change these values by params
+    if (args.length == 3) {
+      tokenCountFeature = args(0)
+      numTrees = toInt(args(1), 500)
+    } else if (args.length == 4) {
+      masterUrl = args(0)
+      tokenCountFeature = args(1)
+      numTrees = toInt(args(2), 500)
+    } else if (args.length != 0) {
+      System.err.println(s"""
+                            |Usage:
+                            |Run it on a cluster:
+                            |  RFHexFileTokenCountFeatureClassifier <masterUrl> <hexFileTokenCountFeature> <numTrees>
+                            |Run it locally:
+                            |  RFHexFileTokenCountFeatureClassifier <hexFileTokenCountFeature> <numTrees>
+                            |Arguments:
+                            |  `masterUrl` is the master url of the spark cluster.
+                            |  `hexFileTokenCountFeature` is the result of HexFileTokenCounterFeatureExtractor.
+                            |  `numTrees` is the number of trees in the forest.
+        """.stripMargin)
+      System.exit(1)
+    }
+
     // Config spark
     val spark = SparkSession
       .builder()
@@ -33,39 +69,18 @@ object RFHexFileTokenCountFeatureClassifier extends Serializable {
       .config("spark.master", masterUrl)
       .getOrCreate()
 
-    val tokenRDD = spark.sparkContext.textFile(tokenCountFeature)
+    // Prepare all the data
+    val rawRDD = spark.sparkContext.textFile(tokenCountFeature)
+    val vecData = rawRDD.filter(line => !line.contains("ID")).map(line => {
+      val arr = line.split(",")
+      val label = arr(1)
+      val features = arr.takeRight(256)
 
-    // Prepare the features
-    val schemaString = "id label features"
-    // 256个特征, 统一用一个 feature 字段表示
-    //    for (i <- 0 to 255) {
-    //      val hex = HexFileTokenCounterFeatureExtractor.numToHex(i)
-    //      schemaString += hex
-    //      if (i != 255) {
-    //        schemaString += " "
-    //      }
-    //    }
-
-
-    // Generate the schema based on the string of schema
-    val fields = schemaString.split(" ").map(fieldName => fieldName match {
-      case "features" => StructField(fieldName, StringType, nullable = true)
-//      case _ => StructField(fieldName, Vectors, nullable = true)
+      (label, Vectors.dense(features.map(toDoubleDynamic)))
+    }).collect().map(r => {
+      (r._1, r._2)
     })
-    val schema = StructType(fields)
-
-    // Convert records of the RDD to Rows
-    val rowRDD = tokenRDD
-      .filter(line => !line.contains("ID"))
-      .map(_.split(","))
-      .map(attributes => {
-        val features = attributes.takeRight(256)
-        val seq = Seq(attributes(0), attributes(1), anySeqToSparkVector(features))
-        Row.fromSeq(seq)
-      })
-
-    // Apply the schema to the RDD
-    val data = spark.createDataFrame(rowRDD, schema)
+    val data = spark.createDataFrame(vecData).toDF("label", "features")
     data.show()
 
     // Index labels, adding metadata to the label column.
@@ -79,7 +94,7 @@ object RFHexFileTokenCountFeatureClassifier extends Serializable {
     val featureIndexer = new VectorIndexer()
       .setInputCol("features")
       .setOutputCol("indexedFeatures")
-      .setMaxCategories(4)
+      .setMaxCategories(9)
       .fit(data)
 
     // Split the data into training and test sets (30% held out for testing).
@@ -89,7 +104,7 @@ object RFHexFileTokenCountFeatureClassifier extends Serializable {
     val rf = new RandomForestClassifier()
       .setLabelCol("indexedLabel")
       .setFeaturesCol("indexedFeatures")
-      .setNumTrees(10)
+      .setNumTrees(numTrees)
 
     // Convert indexed labels back to original labels.
     val labelConverter = new IndexToString()
@@ -115,7 +130,7 @@ object RFHexFileTokenCountFeatureClassifier extends Serializable {
       .setPredictionCol("prediction")
       .setMetricName("accuracy")
     val accuracy = evaluator.evaluate(predictions)
-    println("Test Error = " + (1.0 - accuracy))
+    println("Accuracy = " + accuracy)
 
     val rfModel = model.stages(2).asInstanceOf[RandomForestClassificationModel]
     println("Learned classification forest model:\n" + rfModel.toDebugString)
@@ -146,5 +161,21 @@ object RFHexFileTokenCountFeatureClassifier extends Serializable {
     case s: Seq[Any] => Vectors.dense(s.toArray.map(toDoubleDynamic))
     case v: Vector[Any] => v
     case _ => throw new ClassCastException("unsupported class")
+  }
+
+  /**
+    * Convert a String to Int, if exception is thrown,
+    * a default value will be returned.
+    *
+    * @param s String to convert
+    * @param default The default value to be returned.
+    * @return
+    */
+  def toInt(s: String, default: Int): Int = {
+    try {
+      s.toInt
+    } catch {
+      case e: Exception => default
+    }
   }
 }
