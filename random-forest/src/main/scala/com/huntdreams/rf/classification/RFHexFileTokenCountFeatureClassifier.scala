@@ -132,8 +132,9 @@ object RFHexFileTokenCountFeatureClassifier extends Serializable {
     val accuracy = evaluator.evaluate(predictions)
     println("Accuracy = " + accuracy)
 
-    val rfModel = model.stages(2).asInstanceOf[RandomForestClassificationModel]
-    println("Learned classification forest model:\n" + rfModel.toDebugString)
+    // Print Tree
+    //val rfModel = model.stages(2).asInstanceOf[RandomForestClassificationModel]
+    //println("Learned classification forest model:\n" + rfModel.toDebugString)
     spark.stop()
   }
 
