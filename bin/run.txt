@@ -1,0 +1,10 @@
+HexFileTokenCounterFeatureExtractor:
+
+bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar com.huntdreams.rf.feature.extract.HexFileTokenCounterFeatureExtractor spark://bogon:7077 /Users/noprom/Documents/Dev/Spark/Pro/malware-classification/data /Users/noprom/Documents/Dev/Spark/Pro/malware-classification/data/subtrain /Users/noprom/Documents/Dev/Spark/Pro/malware-classification/data/subtrainLabels.csv
+
+RFHexFileTokenCountFeatureClassifier:
+
+bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar com.huntdreams.rf.classification.RFHexFileTokenCountFeatureClassifier /Users/noprom/Documents/Dev/Spark/Pro/malware-classification/data/hex_file_token_count_feature.csv
+
+bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar com.huntdreams.rf.classification.RFHexFileTokenCountFeatureClassifier /Users/noprom/Documents/Dev/Spark/Pro/malware-classification/data/hexFileTokenCountFeature.csv
+
