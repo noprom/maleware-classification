@@ -12,3 +12,7 @@
 运行这个项目, 执行以下命令即可:
 
     bin/run.sh jar-file-in-the-jars-directory class-name
+    
+## Evaluation
+
+* HexFileTokenCountFeatureRFClassifier Accuracy = 0.8295964125560538
