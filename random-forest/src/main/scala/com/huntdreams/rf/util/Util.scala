@@ -1,4 +1,4 @@
-package com.huntdreams.rf
+package com.huntdreams.rf.util
 
 import org.apache.spark.ml.linalg.Vectors
 
