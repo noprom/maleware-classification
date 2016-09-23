@@ -28,6 +28,7 @@ object EstimatorTransformerParam {
       (1.0, Vectors.dense(0.0, 1.2, -0.5))
     )).toDF("label", "features")
 
+
     // Create a LogisticRegression instance. This instance is an Estimator.
     val lr = new LogisticRegression()
     // Print out the parameters, documentation, and any default values.
