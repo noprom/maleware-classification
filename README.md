@@ -15,4 +15,8 @@
     
 ## Evaluation
 
-* HexFileTokenCountFeatureRFClassifier Accuracy = 0.8295964125560538
+* HexFileTokenCountFeatureRFClassifier
+Accuracy = 0.8295964125560538
+Normalizer:
+    Accuracy = 0.9283154121863799 L1 Norm
+    Accuracy = 0.8333333333333334 L2 Norm

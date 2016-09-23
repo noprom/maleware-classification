@@ -100,11 +100,17 @@ object HexFileTokenCountFeatureRFClassifier extends Serializable {
     val predictions = model.transform(testData)
 
     // Select example rows to display.
-    predictions.select("predictedLabel", "label", "features").show(5)
+    predictions.show(5)
+
+    // Evaluator Label
+    val evaluatorLabel = featureTransformer match {
+      case STRING_INDEXER_TRANSFORMER => "indexedLabel"
+      case NORMALIZER_TRANSFORMER => "label"
+    }
 
     // Select (prediction, true label) and compute accuracy.
     val evaluator = new MulticlassClassificationEvaluator()
-      .setLabelCol("indexedLabel")
+      .setLabelCol(evaluatorLabel)
       .setPredictionCol("prediction")
       .setMetricName("accuracy")
     val accuracy = evaluator.evaluate(predictions)
@@ -131,7 +137,7 @@ object HexFileTokenCountFeatureRFClassifier extends Serializable {
       val label = arr(1)
       val features = arr.takeRight(256)
 
-      (label, Vectors.dense(features.map(Util.toDoubleDynamic)))
+      (Util.toDoubleDynamic(label), Vectors.dense(features.map(Util.toDoubleDynamic)))
     }).collect().map(r => {
       (r._1, r._2)
     })
@@ -217,8 +223,8 @@ object HexFileTokenCountFeatureRFClassifier extends Serializable {
       .setOutputCol(transformFeatureCol)
       .setP(1.0)
 
-    val l1NormData = normalizer.transform(data)
-    println(l1NormData.show())
+//    val l1NormData = normalizer.transform(data)
+//    println(l1NormData.show())
 
     // Train a RandomForest model.
     val rf = new RandomForestClassifier()
@@ -226,7 +232,6 @@ object HexFileTokenCountFeatureRFClassifier extends Serializable {
       .setFeaturesCol(transformFeatureCol)
       .setNumTrees(numTrees)
 
-    // TODO: fit rf model
     // Chain normalizer and forest in a Pipeline.
     val pipeline = new Pipeline().setStages(Array(normalizer, rf))
     pipeline
