@@ -8,9 +8,7 @@
     <artifactId>malware-classification</artifactId>
     <version>1.0.0</version>
     <modules>
-        <module>svm</module>
         <module>random-forest</module>
-        <module>spark-examples</module>
     </modules>
     <packaging>pom</packaging>
     <name>Malware Classification with Spark</name>

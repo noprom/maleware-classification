@@ -22,7 +22,7 @@ rm -rf $jar_dir/*
 if [ $# -eq 1 ]; then
     modules=($1)
 else
-    modules=("svm" "random-forest" "spark-examples")
+    modules=("random-forest")
 fi
 for module in ${modules[@]}; do
     echo "building module ${module}..."
