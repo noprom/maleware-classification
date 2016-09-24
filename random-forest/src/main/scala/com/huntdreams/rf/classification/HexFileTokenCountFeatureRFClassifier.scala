@@ -49,8 +49,8 @@ object HexFileTokenCountFeatureRFClassifier extends Serializable {
   def main(args: Array[String]): Unit = {
     var masterUrl = "local"
     // Feature transformer, defaults to Normalizer
-    var featureTransformer = MIN_MAX_SCALAR_TRANSFORMER
-    var tokenCountFeature = "/Users/noprom/Documents/Dev/Spark/Pro/malware-classification/data/hexFileTokenCountFeature.subtrain.csv"
+    var featureTransformer = NORMALIZER_TRANSFORMER
+    var tokenCountFeature = "/Users/noprom/Documents/Dev/Spark/Pro/malware-classification/data/hex_file_token_count_feature.csv"
 
     // Change these values by params
     if (args.length == 4) {
