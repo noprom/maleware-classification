@@ -35,7 +35,7 @@ submit_url=spark://$hostname:7077
 sudo $SPARK_HOME/bin/spark-submit \
   --class $classname \
   --master $submit_url \
-  --executor-memory 6G \
+  --executor-memory 7G \
   --total-executor-cores 4 \
   $filename \
   $3 $4 $5 $6 $7 $8 $9 $10

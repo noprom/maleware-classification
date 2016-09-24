@@ -4,7 +4,7 @@ import com.huntdreams.rf.util.Util
 import org.apache.spark.ml.Pipeline
 import org.apache.spark.ml.classification.RandomForestClassifier
 import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator
-import org.apache.spark.ml.feature.{IndexToString, StringIndexer, VectorIndexer, Normalizer}
+import org.apache.spark.ml.feature._
 import org.apache.spark.ml.linalg.Vectors
 import org.apache.spark.sql
 import org.apache.spark.sql.{DataFrame, SparkSession}
@@ -24,7 +24,7 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
   *   `hexFileTokenCountFeature` is the result of HexFileTokenCounterFeatureExtractor.
   *   `numTrees` is number of trees in the forest.
   *   `featureTransformer` is the transformer used to transform the features.
-  *      Available options: StringIndexer Normalizer
+  *      Available options: Standard StringIndexer Normalizer StandardScaler MinMaxScaler
   *
   * Example:
   * To run it on a spark cluster:
@@ -39,15 +39,18 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 object HexFileTokenCountFeatureRFClassifier extends Serializable {
 
   var numTrees = 500
+  val NO_TRANSFORMER = "NoTransformer"
   val STRING_INDEXER_TRANSFORMER = "StringIndexer"
   val NORMALIZER_TRANSFORMER = "Normalizer"
-  val availableTransformer = Array(STRING_INDEXER_TRANSFORMER, NORMALIZER_TRANSFORMER)
+  val STANDARD_SCALAR_TRANSFORMER = "StandardScaler"
+  val MIN_MAX_SCALAR_TRANSFORMER = "MinMaxScaler"
+  val availableTransformer = Array(NO_TRANSFORMER, STRING_INDEXER_TRANSFORMER, NORMALIZER_TRANSFORMER, STANDARD_SCALAR_TRANSFORMER, MIN_MAX_SCALAR_TRANSFORMER)
 
   def main(args: Array[String]): Unit = {
     var masterUrl = "local"
     // Feature transformer, defaults to Normalizer
-    var featureTransformer = NORMALIZER_TRANSFORMER
-    var tokenCountFeature = "/Users/noprom/Documents/Dev/Spark/Pro/malware-classification/data/hexFileTokenCountFeature.csv"
+    var featureTransformer = MIN_MAX_SCALAR_TRANSFORMER
+    var tokenCountFeature = "/Users/noprom/Documents/Dev/Spark/Pro/malware-classification/data/hexFileTokenCountFeature.subtrain.csv"
 
     // Change these values by params
     if (args.length == 4) {
@@ -72,7 +75,7 @@ object HexFileTokenCountFeatureRFClassifier extends Serializable {
            |  `hexFileTokenCountFeature` is the result of HexFileTokenCounterFeatureExtractor.
            |  `numTrees` is the number of trees in the forest.
            |  `featureTransformer` is the transformer used to transform the features.
-           |      Available options: StringIndexer Normalizer
+           |      Available options: StringIndexer Normalizer StandardScaler
         """.stripMargin)
       System.exit(1)
     }
@@ -105,7 +108,7 @@ object HexFileTokenCountFeatureRFClassifier extends Serializable {
     // Evaluator Label
     val evaluatorLabel = featureTransformer match {
       case STRING_INDEXER_TRANSFORMER => "indexedLabel"
-      case NORMALIZER_TRANSFORMER => "label"
+      case _ => "label"
     }
 
     // Select (prediction, true label) and compute accuracy.
@@ -155,10 +158,34 @@ object HexFileTokenCountFeatureRFClassifier extends Serializable {
     */
   def setUpPipeline(data: DataFrame, featureTransformer: String): Pipeline = {
     val pipeline = featureTransformer match {
+      case NO_TRANSFORMER => noTransformerPipeline(data)
       case STRING_INDEXER_TRANSFORMER => stringIndexerPipeline(data)
       case NORMALIZER_TRANSFORMER => normalizerPipeline(data)
+      case STANDARD_SCALAR_TRANSFORMER => standardScalerPipeline(data)
+      case MIN_MAX_SCALAR_TRANSFORMER => minMaxScalarPipeline(data)
       case _ => throw new IllegalArgumentException("featureTransformer is illegal")
     }
+    pipeline
+  }
+
+  /**
+    * Use nothing to transform the data.
+    *
+    * @param data data
+    * @return pipeline
+    */
+  def noTransformerPipeline(data: DataFrame): Pipeline = {
+    val inputCol = "label"
+    val featureCol = "features"
+
+    // Train a RandomForest model.
+    val rf = new RandomForestClassifier()
+      .setLabelCol(inputCol)
+      .setFeaturesCol(featureCol)
+      .setNumTrees(numTrees)
+
+    // Chain normalizer and forest in a Pipeline.
+    val pipeline = new Pipeline().setStages(Array(rf))
     pipeline
   }
 
@@ -223,8 +250,8 @@ object HexFileTokenCountFeatureRFClassifier extends Serializable {
       .setOutputCol(transformFeatureCol)
       .setP(1.0)
 
-//    val l1NormData = normalizer.transform(data)
-//    println(l1NormData.show())
+    val l1NormData = normalizer.transform(data)
+    println(l1NormData.show())
 
     // Train a RandomForest model.
     val rf = new RandomForestClassifier()
@@ -234,6 +261,73 @@ object HexFileTokenCountFeatureRFClassifier extends Serializable {
 
     // Chain normalizer and forest in a Pipeline.
     val pipeline = new Pipeline().setStages(Array(normalizer, rf))
+    pipeline
+  }
+
+  /**
+    * Use standard scaler to transform the data.
+    *
+    * @param data dataframe
+    * @return pipeline
+    */
+  def standardScalerPipeline(data: DataFrame): Pipeline = {
+    val inputCol = "label"
+    val featureCol = "features"
+    val transformFeatureCol = "scaledFeatures"
+
+    val scaler = new StandardScaler()
+      .setInputCol(featureCol)
+      .setOutputCol(transformFeatureCol)
+      .setWithStd(true)
+      .setWithMean(false)
+    // Compute summary statistics by fitting the StandardScaler.
+    val scalerModel = scaler.fit(data)
+
+    // Normalize each feature to have unit standard deviation.
+    val scaledData = scalerModel.transform(data)
+    scaledData.show()
+
+    // Train a RandomForest model.
+    val rf = new RandomForestClassifier()
+      .setLabelCol(inputCol)
+      .setFeaturesCol(transformFeatureCol)
+      .setNumTrees(numTrees)
+
+    // Chain normalizer and forest in a Pipeline.
+    val pipeline = new Pipeline().setStages(Array(scaler, rf))
+    pipeline
+  }
+
+  /**
+    * Use MinMaxScalaer to transform the data.
+    *
+    * @param data dataframe
+    * @return pipeline
+    */
+  def minMaxScalarPipeline(data: DataFrame): Pipeline = {
+    val inputCol = "label"
+    val featureCol = "features"
+    val transformFeatureCol = "scaledFeatures"
+
+    val scaler = new MinMaxScaler()
+      .setInputCol(featureCol)
+      .setOutputCol(transformFeatureCol)
+
+    // Compute summary statistics and generate MinMaxScalerModel
+    val scalerModel = scaler.fit(data)
+
+    // rescale each feature to range [min, max].
+    val scaledData = scalerModel.transform(data)
+    scaledData.show()
+
+    // Train a RandomForest model.
+    val rf = new RandomForestClassifier()
+      .setLabelCol(inputCol)
+      .setFeaturesCol(transformFeatureCol)
+      .setNumTrees(numTrees)
+
+    // Chain normalizer and forest in a Pipeline.
+    val pipeline = new Pipeline().setStages(Array(scaler, rf))
     pipeline
   }
 }

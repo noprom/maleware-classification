@@ -74,7 +74,10 @@ object HexFileTokenCounterFeatureExtractor extends Serializable {
       .getOrCreate()
 
     // 以参数的形式传递过来
-    val outPutFileName = dataPath + "/hex_file_token_count_feature"
+    var outPutFileName = dataPath + "/hex_file_token_count_feature"
+    if (trainDataPath.contains("subtrain")) {
+      outPutFileName += ".subtrain"
+    }
     val writer = new PrintWriter(outPutFileName + ".csv")
     val svmWriter = new PrintWriter(outPutFileName + ".svm.txt")
     val reader = new BufferedReader(new FileReader(trainLabels))
