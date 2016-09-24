@@ -77,7 +77,8 @@ object AsmFile3GramFeatureExtractor extends Serializable {
 //          svmWriter.write(label)
           val filePath = trainDataPath + "/" + fileName
           val asmFile = spark.sparkContext.textFile(filePath + ".asm")
-          val opcode = asmFile.filter(line => line.contains(".text")).map(line => )
+          val opcode = asmFile.filter(line => line.contains(".text")).map(line => getOpSeq(line))
+
           writer.write("\n")
           svmWriter.write("\n")
           print("\n")
