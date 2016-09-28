@@ -51,4 +51,20 @@ object Util extends Serializable {
       case e: Exception => default
     }
   }
+
+  /**
+    * Convert a String to Double, if exception is thrown,
+    * a default value will be returned.
+    *
+    * @param s String to convert
+    * @param default The default value to be returned.
+    * @return
+    */
+  def toDouble(s: String, default: Double): Double = {
+    try {
+      s.toDouble
+    } catch {
+      case e: Exception => default
+    }
+  }
 }

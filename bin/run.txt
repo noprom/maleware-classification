@@ -1,4 +1,4 @@
-HexFileTokenCounterFeatureExtractor:
+==================== HexFileTokenCounterFeatureExtractor ====================
 
 Subtrain data:
 bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar com.huntdreams.rf.feature.extract.HexFileTokenCounterFeatureExtractor spark://nopromdeMacBook-Pro.local:7077 /Users/noprom/Documents/Dev/Spark/Pro/malware-classification/data /Users/noprom/Documents/Dev/Spark/Pro/malware-classification/data/subtrain /Users/noprom/Documents/Dev/Spark/Pro/malware-classification/data/subtrainLabels.csv
@@ -6,10 +6,46 @@ bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar 
 Full data:
 bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar com.huntdreams.rf.feature.extract.HexFileTokenCounterFeatureExtractor spark://nopromdeMacBook-Pro.local:7077 /Volumes/Mac/data /Volumes/Mac/data/train /Volumes/Mac/data/trainLabels.csv
 
+==================== HexFileTokenCountFeatureRFClassifier ====================
 
-RFHexFileTokenCountFeatureClassifier:
+Usage:
+bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar com.huntdreams.rf.classification.HexFileTokenCountFeatureRFClassifier /Users/noprom/Documents/Dev/Spark/Pro/malware-classification/data/hex_file_token_count_feature.csv
 
-bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar com.huntdreams.rf.classification.RFHexFileTokenCountFeatureClassifier /Users/noprom/Documents/Dev/Spark/Pro/malware-classification/data/hex_file_token_count_feature.csv
+Local:
+bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar com.huntdreams.rf.classification.HexFileTokenCountFeatureRFClassifier /Users/noprom/Documents/Dev/Spark/Pro/malware-classification/data/hex_file_token_count_feature.csv Normalizer 500 0.7 0.3 | grep Accuracy
 
-bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar com.huntdreams.rf.classification.RFHexFileTokenCountFeatureClassifier /Users/noprom/Documents/Dev/Spark/Pro/malware-classification/data/hexFileTokenCountFeature.csv
+Cluster:
+(1)Normalizer
+bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar com.huntdreams.rf.classification.HexFileTokenCountFeatureRFClassifier spark://nopromdeMacBook-Pro.local:7077 /Users/noprom/Documents/Dev/Spark/Pro/malware-classification/data/hex_file_token_count_feature.csv Normalizer 500 0.9 0.1 | grep Accuracy
+bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar com.huntdreams.rf.classification.HexFileTokenCountFeatureRFClassifier spark://nopromdeMacBook-Pro.local:7077 /Users/noprom/Documents/Dev/Spark/Pro/malware-classification/data/hex_file_token_count_feature.csv Normalizer 500 0.8 0.2 | grep Accuracy
+bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar com.huntdreams.rf.classification.HexFileTokenCountFeatureRFClassifier spark://nopromdeMacBook-Pro.local:7077 /Users/noprom/Documents/Dev/Spark/Pro/malware-classification/data/hex_file_token_count_feature.csv Normalizer 500 0.7 0.3 | grep Accuracy
+bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar com.huntdreams.rf.classification.HexFileTokenCountFeatureRFClassifier spark://nopromdeMacBook-Pro.local:7077 /Users/noprom/Documents/Dev/Spark/Pro/malware-classification/data/hex_file_token_count_feature.csv Normalizer 500 0.6 0.4 | grep Accuracy
+bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar com.huntdreams.rf.classification.HexFileTokenCountFeatureRFClassifier spark://nopromdeMacBook-Pro.local:7077 /Users/noprom/Documents/Dev/Spark/Pro/malware-classification/data/hex_file_token_count_feature.csv Normalizer 500 0.5 0.5 | grep Accuracy
 
+(2)StringIndexer
+bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar com.huntdreams.rf.classification.HexFileTokenCountFeatureRFClassifier spark://nopromdeMacBook-Pro.local:7077 /Users/noprom/Documents/Dev/Spark/Pro/malware-classification/data/hex_file_token_count_feature.csv StringIndexer 500 0.9 0.1 | grep Accuracy
+bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar com.huntdreams.rf.classification.HexFileTokenCountFeatureRFClassifier spark://nopromdeMacBook-Pro.local:7077 /Users/noprom/Documents/Dev/Spark/Pro/malware-classification/data/hex_file_token_count_feature.csv StringIndexer 500 0.8 0.2 | grep Accuracy
+bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar com.huntdreams.rf.classification.HexFileTokenCountFeatureRFClassifier spark://nopromdeMacBook-Pro.local:7077 /Users/noprom/Documents/Dev/Spark/Pro/malware-classification/data/hex_file_token_count_feature.csv StringIndexer 500 0.7 0.3 | grep Accuracy
+bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar com.huntdreams.rf.classification.HexFileTokenCountFeatureRFClassifier spark://nopromdeMacBook-Pro.local:7077 /Users/noprom/Documents/Dev/Spark/Pro/malware-classification/data/hex_file_token_count_feature.csv StringIndexer 500 0.6 0.4 | grep Accuracy
+bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar com.huntdreams.rf.classification.HexFileTokenCountFeatureRFClassifier spark://nopromdeMacBook-Pro.local:7077 /Users/noprom/Documents/Dev/Spark/Pro/malware-classification/data/hex_file_token_count_feature.csv StringIndexer 500 0.5 0.5 | grep Accuracy
+
+(3)NoTransformer
+bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar com.huntdreams.rf.classification.HexFileTokenCountFeatureRFClassifier spark://nopromdeMacBook-Pro.local:7077 /Users/noprom/Documents/Dev/Spark/Pro/malware-classification/data/hex_file_token_count_feature.csv NoTransformer 500 0.9 0.1 | grep Accuracy
+bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar com.huntdreams.rf.classification.HexFileTokenCountFeatureRFClassifier spark://nopromdeMacBook-Pro.local:7077 /Users/noprom/Documents/Dev/Spark/Pro/malware-classification/data/hex_file_token_count_feature.csv NoTransformer 500 0.8 0.2 | grep Accuracy
+bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar com.huntdreams.rf.classification.HexFileTokenCountFeatureRFClassifier spark://nopromdeMacBook-Pro.local:7077 /Users/noprom/Documents/Dev/Spark/Pro/malware-classification/data/hex_file_token_count_feature.csv NoTransformer 500 0.7 0.3 | grep Accuracy
+bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar com.huntdreams.rf.classification.HexFileTokenCountFeatureRFClassifier spark://nopromdeMacBook-Pro.local:7077 /Users/noprom/Documents/Dev/Spark/Pro/malware-classification/data/hex_file_token_count_feature.csv NoTransformer 500 0.6 0.4 | grep Accuracy
+bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar com.huntdreams.rf.classification.HexFileTokenCountFeatureRFClassifier spark://nopromdeMacBook-Pro.local:7077 /Users/noprom/Documents/Dev/Spark/Pro/malware-classification/data/hex_file_token_count_feature.csv NoTransformer 500 0.5 0.5 | grep Accuracy
+
+(4)StandardScaler
+bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar com.huntdreams.rf.classification.HexFileTokenCountFeatureRFClassifier spark://nopromdeMacBook-Pro.local:7077 /Users/noprom/Documents/Dev/Spark/Pro/malware-classification/data/hex_file_token_count_feature.csv StandardScaler 500 0.9 0.1 | grep Accuracy
+bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar com.huntdreams.rf.classification.HexFileTokenCountFeatureRFClassifier spark://nopromdeMacBook-Pro.local:7077 /Users/noprom/Documents/Dev/Spark/Pro/malware-classification/data/hex_file_token_count_feature.csv StandardScaler 500 0.8 0.2 | grep Accuracy
+bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar com.huntdreams.rf.classification.HexFileTokenCountFeatureRFClassifier spark://nopromdeMacBook-Pro.local:7077 /Users/noprom/Documents/Dev/Spark/Pro/malware-classification/data/hex_file_token_count_feature.csv StandardScaler 500 0.7 0.3 | grep Accuracy
+bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar com.huntdreams.rf.classification.HexFileTokenCountFeatureRFClassifier spark://nopromdeMacBook-Pro.local:7077 /Users/noprom/Documents/Dev/Spark/Pro/malware-classification/data/hex_file_token_count_feature.csv StandardScaler 500 0.6 0.4 | grep Accuracy
+bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar com.huntdreams.rf.classification.HexFileTokenCountFeatureRFClassifier spark://nopromdeMacBook-Pro.local:7077 /Users/noprom/Documents/Dev/Spark/Pro/malware-classification/data/hex_file_token_count_feature.csv StandardScaler 500 0.5 0.5 | grep Accuracy
+
+(5)MinMaxScaler
+bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar com.huntdreams.rf.classification.HexFileTokenCountFeatureRFClassifier spark://nopromdeMacBook-Pro.local:7077 /Users/noprom/Documents/Dev/Spark/Pro/malware-classification/data/hex_file_token_count_feature.csv MinMaxScaler 500 0.9 0.1 | grep Accuracy
+bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar com.huntdreams.rf.classification.HexFileTokenCountFeatureRFClassifier spark://nopromdeMacBook-Pro.local:7077 /Users/noprom/Documents/Dev/Spark/Pro/malware-classification/data/hex_file_token_count_feature.csv MinMaxScaler 500 0.8 0.2 | grep Accuracy
+bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar com.huntdreams.rf.classification.HexFileTokenCountFeatureRFClassifier spark://nopromdeMacBook-Pro.local:7077 /Users/noprom/Documents/Dev/Spark/Pro/malware-classification/data/hex_file_token_count_feature.csv MinMaxScaler 500 0.7 0.3 | grep Accuracy
+bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar com.huntdreams.rf.classification.HexFileTokenCountFeatureRFClassifier spark://nopromdeMacBook-Pro.local:7077 /Users/noprom/Documents/Dev/Spark/Pro/malware-classification/data/hex_file_token_count_feature.csv MinMaxScaler 500 0.6 0.4 | grep Accuracy
+bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar com.huntdreams.rf.classification.HexFileTokenCountFeatureRFClassifier spark://nopromdeMacBook-Pro.local:7077 /Users/noprom/Documents/Dev/Spark/Pro/malware-classification/data/hex_file_token_count_feature.csv MinMaxScaler 500 0.5 0.5 | grep Accuracy

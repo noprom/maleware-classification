@@ -5,7 +5,7 @@ case ${option} in
      -h)
         echo "Usage:"
         echo "-h                    print help message."
-        echo "module_name           compile module named module_name, modules available: svm random-forest spark-examples"
+        echo "module_name           compile module named module_name, modules available: random-forest"
         exit 1
         ;;
 esac

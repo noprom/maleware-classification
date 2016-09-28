@@ -15,22 +15,24 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
   *
   * Usage:
   * To run it on a cluster, you can use:
-  *   HexFileTokenCountFeatureRFClassifier <masterUrl> <hexFileTokenCountFeature> <numTrees> <featureTransformer>
+  *   HexFileTokenCountFeatureRFClassifier <masterUrl> <hexFileTokenCountFeature> <featureTransformer> <numTrees> <trainSize> <testSize>
   * Or, you can run it locally:
-  *   HexFileTokenCountFeatureRFClassifier <hexFileTokenCountFeature> <numTrees> <featureTransformer>
+  *   HexFileTokenCountFeatureRFClassifier <hexFileTokenCountFeature> <featureTransformer> <numTrees> <trainSize> <testSize>
   *
   * Arguments:
   *   `masterUrl` is the master url of the spark cluster.
   *   `hexFileTokenCountFeature` is the result of HexFileTokenCounterFeatureExtractor.
-  *   `numTrees` is number of trees in the forest.
   *   `featureTransformer` is the transformer used to transform the features.
-  *      Available options: Standard StringIndexer Normalizer StandardScaler MinMaxScaler
+  *      Available options: NoTransformer StringIndexer Normalizer StandardScaler MinMaxScaler
+  *   `numTrees` is number of trees in the forest.
+  *   `trainSize` is the train size in the cross validation.
+  *   `testSize` is the test size in the cross validation.
   *
   * Example:
   * To run it on a spark cluster:
-  *   $ bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar com.huntdreams.rf.classification.HexFileTokenCountFeatureRFClassifier masterUrl hexFileTokenCountFeature 500 StringIndexer
+  *   $ bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar com.huntdreams.rf.classification.HexFileTokenCountFeatureRFClassifier masterUrl hexFileTokenCountFeature Normalizer 500 0.7 0.3
   * Or, run it locally:
-  *   $ bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar com.huntdreams.rf.classification.HexFileTokenCountFeatureRFClassifier hexFileTokenCountFeature 500 StringIndexer
+  *   $ bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar com.huntdreams.rf.classification.HexFileTokenCountFeatureRFClassifier hexFileTokenCountFeature Normalizer 500 0.7 0.3
   * You can also hit the run button in Intellij IDEA to run it locally.
   *
   * Author: Noprom <tyee.noprom@qq.com>
@@ -39,6 +41,8 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 object HexFileTokenCountFeatureRFClassifier extends Serializable {
 
   var numTrees = 500
+  var trainSize = 0.7
+  var testSize = 0.3
   val NO_TRANSFORMER = "NoTransformer"
   val STRING_INDEXER_TRANSFORMER = "StringIndexer"
   val NORMALIZER_TRANSFORMER = "Normalizer"
@@ -53,29 +57,35 @@ object HexFileTokenCountFeatureRFClassifier extends Serializable {
     var tokenCountFeature = "/Users/noprom/Documents/Dev/Spark/Pro/malware-classification/data/hex_file_token_count_feature.csv"
 
     // Change these values by params
-    if (args.length == 4) {
+    if (args.length == 6) {
       tokenCountFeature = args(0)
-      numTrees = Util.toInt(args(1), 500)
-      featureTransformer = args(2)
-    } else if (args.length == 5) {
+      featureTransformer = args(1)
+      numTrees = Util.toInt(args(2), numTrees)
+      trainSize = Util.toDouble(args(3), trainSize)
+      testSize = Util.toDouble(args(4), testSize)
+    } else if (args.length == 7) {
       masterUrl = args(0)
       tokenCountFeature = args(1)
-      numTrees = Util.toInt(args(2), 500)
-      featureTransformer = args(3)
+      featureTransformer = args(2)
+      numTrees = Util.toInt(args(3), numTrees)
+      trainSize = Util.toDouble(args(4), trainSize)
+      testSize = Util.toDouble(args(5), testSize)
     } else if (args.length != 0 || !availableTransformer.contains(featureTransformer)) {
       System.err.println(
         s"""
            |Usage:
            |Run it on a cluster:
-           |  HexFileTokenCountFeatureRFClassifier <masterUrl> <hexFileTokenCountFeature> <numTrees> <featureTransformer>
+           |  HexFileTokenCountFeatureRFClassifier <masterUrl> <hexFileTokenCountFeature> <featureTransformer> <numTrees> <trainSize> <testSize>
            |Run it locally:
-           |  HexFileTokenCountFeatureRFClassifier <hexFileTokenCountFeature> <numTrees> <featureTransformer>
+           |  HexFileTokenCountFeatureRFClassifier <hexFileTokenCountFeature> <featureTransformer> <numTrees> <trainSize> <testSize>
            |Arguments:
            |  `masterUrl` is the master url of the spark cluster.
            |  `hexFileTokenCountFeature` is the result of HexFileTokenCounterFeatureExtractor.
-           |  `numTrees` is the number of trees in the forest.
            |  `featureTransformer` is the transformer used to transform the features.
-           |      Available options: StringIndexer Normalizer StandardScaler
+           |      Available options: NoTransformer StringIndexer Normalizer StandardScaler MinMaxScaler
+           |  `numTrees` is the number of trees in the forest.
+           |  `trainSize` is the train size in the cross validation.
+           |  `testSize` is the test size in the cross validation.
         """.stripMargin)
       System.exit(1)
     }
@@ -93,8 +103,8 @@ object HexFileTokenCountFeatureRFClassifier extends Serializable {
     // Set up pipeline
     val pipeline = setUpPipeline(data, featureTransformer)
 
-    // Split the data into training and test sets (30% held out for testing).
-    val Array(trainingData, testData) = data.randomSplit(Array(0.7, 0.3))
+    // Split the data into training and test sets.
+    val Array(trainingData, testData) = data.randomSplit(Array(trainSize, testSize))
 
     // Train model. This also runs the indexers.
     val model = pipeline.fit(trainingData)

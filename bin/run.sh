@@ -6,12 +6,12 @@ if [ $# -lt 2 ]; then
     echo -e "Available commands:\n"
     echo -e "========== Feature extractor ==========\n"
     echo -e "HexFileTokenCounterFeatureExtractor:"
-    echo "  $ bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar com.huntdreams.rf.feature.extract.HexFileTokenCounterFeatureExtractor masterUrl dataPath trainDataPath trainLabels"
-    echo "  $ bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar com.huntdreams.rf.feature.extract.HexFileTokenCounterFeatureExtractor dataPath trainDataPath trainLabels"
+    echo "  $ bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar com.huntdreams.rf.feature.extract.HexFileTokenCounterFeatureExtractor <masterUrl> <dataPath> <trainDataPath> <trainLabels>"
+    echo "  $ bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar com.huntdreams.rf.feature.extract.HexFileTokenCounterFeatureExtractor <dataPath> <trainDataPath> <trainLabels>"
     echo -e "\n==========  Classification   ==========\n"
     echo -e "HexFileTokenCountFeatureRFClassifier:"
-    echo "  $ bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar com.huntdreams.rf.classification.HexFileTokenCountFeatureRFClassifier masterUrl hexFileTokenCountFeature"
-    echo "  $ bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar com.huntdreams.rf.classification.HexFileTokenCountFeatureRFClassifier hexFileTokenCountFeature"
+    echo "  $ bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar com.huntdreams.rf.classification.HexFileTokenCountFeatureRFClassifier <masterUrl> <hexFileTokenCountFeature> <featureTransformer> <numTrees> <trainSize> <testSize>"
+    echo "  $ bin/run.sh malware-classification-random-forest-1.0.0-jar-with-dependencies.jar com.huntdreams.rf.classification.HexFileTokenCountFeatureRFClassifier <hexFileTokenCountFeature> <featureTransformer> <numTrees> <trainSize> <testSize>"
     exit 1;
 fi
 
